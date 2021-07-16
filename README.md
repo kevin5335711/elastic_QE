@@ -6,6 +6,6 @@ make sure all ur opt.sout and opt.in are prepared
 
 2. 00elastic_QE.pl to Change atom positions ($random) and boxs ($scale)
 
-3. 01elastic_QE.pl to get stress from 00elastic_QE.pl
+3. 01elastic_QE.pl to get pressure from 00elastic_QE.pl
 
 4. 02elastic_QE.pl to calculate and output the file elastic_Opt_* 
