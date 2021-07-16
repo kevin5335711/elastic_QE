@@ -1,6 +1,6 @@
 # elastic_QE
 
-make sure ur all opt.sout  opt.in are prepared 
+make sure all ur opt.sout and opt.in are prepared 
 
 1. makedata.pl to make ur data files for 00elastic_QE.pl
 
