@@ -8,4 +8,5 @@ make sure all ur opt.sout and opt.in are prepared
 
 3. 01elastic_QE.pl to get pressure from 00elastic_QE.pl
 
-4. 02elastic_QE.pl to calculate and output the file elastic_Opt_* 
+4. 02elastic_QE.pl to calculate preesure ($constant must = $scale)
+    and output the file elastic_Opt_* 
