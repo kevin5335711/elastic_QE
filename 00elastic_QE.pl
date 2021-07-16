@@ -30,17 +30,44 @@ my $random = 1.0e-3;
 for my $id (0..$#filename){
 
 
-
-
-
-
     my $foldername = "$currentPath/$myelement/Opt/Opt-$filename[$id]/elastic";
     my @ele = split("([A-Z][a-z])",$element[$id]);
     @ele = map (($_ =~ m/([A-Z][a-z])/gm),@ele);
 
-    if (-e "$foldername/Chg+1-$filename[$id].in"){
-        next;
+    if (-e "$foldername/$changebox"){
+        chdir("$foldername");
+        for(1..6){
+            if( exists $running{"Chg+$_-$filename[$id]"}){
+                next;
+            }
+            if (-e "$foldername/Chg+$_-$filename[$id].sout" ){
+                my $done =  `grep -o -a 'ATOMIC_POSITIONS (angstrom)' $foldername/Chg+$_-$filename[$id].sout | sed -n '\$p'`; 
+                chomp $done;
+                if( $done eq "ATOMIC_POSITIONS (angstrom)" ){
+                    next;
+                }
+            }
+            system ("sbatch Chg+$_-$filename[$id].sh");   
+            print qq(sbatch $foldername/Chg+$_-$filename[$id].sh\n);
+        }
+        for(1..6){
+            if( exists $running{"Chg-$_-$filename[$id]"}){
+                next;
+            }
+            if (-e "$foldername/Chg-$_-$filename[$id].sout" ){
+                my $done =  `grep -o -a 'ATOMIC_POSITIONS (angstrom)' $foldername/Chg-$_-$filename[$id].sout | sed -n '\$p'`; 
+                chomp $done;
+                if( $done eq "ATOMIC_POSITIONS (angstrom)" ){
+                    next;
+                }
+            }
+            system ("sbatch Chg-$_-$filename[$id].sh");   
+            print qq(sbatch $foldername/Chg-$_-$filename[$id].sh\n);
+        }
+        chdir("$currentPath");
+        next;    
     }
+
 
     `mkdir -p $foldername`;
     `cp $currentPath/$myelement/Opt/Opt-$filename[$id]/Opt-$filename[$id].in $foldername/$changebox`;
@@ -153,18 +180,7 @@ for my $id (0..$#filename){
 	`sed -i '/#sed_anchor02/a mpiexec $QE_path -in Chg+$_-$filename[$id].in' $slurmbatch`;
     `cp $currentPath/QE_slurmEla.sh $foldername/Chg+$_-$filename[$id].sh`;
 
-    if( exists $running{"Chg+$_-$filename[$id]"}){
-      next;
-    }
-    if (-e "$foldername/Chg+$_-$filename[$id].sout" ){
-      my $done =  `grep -o -a 'ATOMIC_POSITIONS (angstrom)' $foldername/Chg+$_-$filename[$id].sout | sed -n '\$p'`; 
-      chomp $done;
 
-      if( $done eq "ATOMIC_POSITIONS (angstrom)" ){
-        next;
-      }
-    }
-    # print qq($foldername\n);
     chdir("$foldername");
     system ("sbatch Chg+$_-$filename[$id].sh");
     chdir("$currentPath");
@@ -243,19 +259,7 @@ for my $id (0..$#filename){
 	`sed -i '/mpiexec.*/d' $slurmbatch`;
 	`sed -i '/#sed_anchor02/a mpiexec $QE_path -in Chg-$_-$filename[$id].in' $slurmbatch`;
     `cp $currentPath/QE_slurmEla.sh $foldername/Chg-$_-$filename[$id].sh`;
-    if( exists $running{"Chg-$_-$filename[$id]"}){
-      next;
-    }
-    if (-e "$foldername/Chg-$_-$filename[$id].sout" ){
-      my $done = `grep -o -a 'ATOMIC_POSITIONS (angstrom)' $foldername/Chg-$_-$filename[$id].sout | sed -n '\$p'`; 
-      chomp $done;
 
-      if( $done eq "ATOMIC_POSITIONS (angstrom)" ){
-        next;
-      }
-    }
-
-    # print qq($foldername\n);
     chdir("$foldername");
     system ("sbatch Chg-$_-$filename[$id].sh");
     chdir("$currentPath");
